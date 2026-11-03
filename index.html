@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>깃들다 GDD | 카드뉴스 생성기 (3열 그리드 뷰)</title>
+  <title>깃들다 GDD | 카드뉴스 생성기</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -41,7 +41,7 @@
       flex-direction: row !important;
     }
 
-    /* 좌측 고정 패널 */
+    /* 좌측 사이드바 패널 */
     .sidebar {
       width: 420px;
       height: 100vh;
@@ -49,16 +49,11 @@
       border-right: 1px solid #22262d;
       display: flex;
       flex-direction: column;
+      padding: 24px;
+      overflow-y: auto;
       font-family: var(--font-sans);
       flex-shrink: 0;
       z-index: 10;
-    }
-
-    /* 폼 영역만 세로 스크롤 처리 */
-    .sidebar-content {
-      flex: 1;
-      overflow-y: auto;
-      padding: 24px;
     }
 
     .brand-header {
@@ -103,7 +98,7 @@
     }
 
     textarea {
-      height: 140px;
+      height: 160px;
       resize: vertical;
       font-family: var(--font-myeongjo);
       line-height: 1.6;
@@ -127,14 +122,7 @@
       cursor: pointer;
     }
 
-    /* 좌측 최하단 상시 고정 버튼 영역 */
-    .sidebar-footer {
-      padding: 16px 24px;
-      background-color: #111418;
-      border-top: 1px solid #22262d;
-      flex-shrink: 0;
-    }
-
+    /* 사이드바 일괄 다운로드 버튼 */
     .btn-download-zip {
       width: 100%;
       background-color: var(--gold-point);
@@ -142,15 +130,17 @@
       font-family: var(--font-sans);
       font-weight: 700;
       border: none;
-      padding: 14px;
+      padding: 15px;
       border-radius: 6px;
       cursor: pointer;
       font-size: 15px;
+      margin-top: 10px;
+      margin-bottom: 30px;
     }
 
     .btn-download-zip:hover { opacity: 0.9; }
 
-    /* 우측 메인 영역 (3열 배치 & 스크롤) */
+    /* 우측 메인 영역: 스크롤 지원 및 그리드 레이아웃 */
     .main-preview {
       flex: 1;
       height: 100vh;
@@ -160,11 +150,11 @@
     }
 
     #previewContainer {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 40px 30px;
-      justify-items: center;
-      align-items: start;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 30px;
+      justify-content: flex-start;
+      align-items: flex-start;
       max-width: 1200px;
       margin: 0 auto;
       padding-bottom: 120px;
@@ -187,6 +177,7 @@
       flex-shrink: 0;
     }
 
+    /* 1080x1350 카드 축소 보정 */
     .card-preview {
       width: 1080px;
       height: 1350px;
@@ -199,7 +190,7 @@
       font-family: var(--font-myeongjo);
     }
 
-    /* 표지 */
+    /* 1. 표지 */
     .card-cover .cover-header {
       position: absolute;
       top: 140px; left: 125px; right: 125px;
@@ -244,7 +235,7 @@
       font-family: var(--font-sans) !important; font-weight: 400 !important;
     }
 
-    /* 본문 */
+    /* 2. 본문 */
     .card-body-slide .body-header {
       position: absolute;
       top: 140px; left: 125px; right: 125px;
@@ -282,7 +273,7 @@
       line-height: 1;
     }
 
-    /* 클로징 */
+    /* 3. 클로징 */
     .card-closing {
       background-color: #12151A;
       display: flex; flex-direction: column; align-items: center;
@@ -322,50 +313,45 @@
 </head>
 <body>
 
-  <!-- 좌측 컨트롤 패널 -->
+  <!-- 좌측 컨트롤 사이드바 -->
   <div class="sidebar">
-    <div class="sidebar-content">
-      <div class="brand-header">
-        <h1>깃들다 GDD</h1>
-        <p>단어를 잇다. 문장을 붙이다. 책을 짓다.</p>
-      </div>
+    <div class="brand-header">
+      <h1>깃들다 GDD</h1>
+      <p>단어를 잇다. 문장을 붙이다. 책을 짓다.</p>
+    </div>
 
-      <div class="form-group">
-        <label for="publishDate">발행 날짜 (파일명용)</label>
-        <input type="date" id="publishDate">
-      </div>
+    <div class="form-group">
+      <label for="publishDate">발행 날짜 (파일명용)</label>
+      <input type="date" id="publishDate">
+    </div>
 
-      <div class="form-group">
-        <label for="categoryInput">상단 카테고리 문구</label>
-        <input type="text" id="categoryInput" value="짧은 생각">
-      </div>
+    <div class="form-group">
+      <label for="categoryInput">상단 카테고리 문구</label>
+      <input type="text" id="categoryInput" value="짧은 생각">
+    </div>
 
-      <div class="form-group">
-        <label for="textInput">원고 입력 (첫 단락=제목 / 줄바꿈 엔터 지원)</label>
-        <textarea id="textInput" placeholder="첫 번째 단락은 [제목]입니다.&#10;&#10;두 번째 단락부터는 [본문]입니다."></textarea>
-      </div>
+    <div class="form-group">
+      <label for="textInput">원고 입력 (첫 단락=제목 / 줄바꿈 엔터 지원)</label>
+      <textarea id="textInput" placeholder="첫 번째 단락은 [제목]입니다.&#10;&#10;두 번째 단락부터는 [본문]입니다."></textarea>
+    </div>
 
-      <div class="form-group">
-        <label for="subtextInput">표지 하단 서문 문구</label>
-        <textarea id="subtextInput" style="height: 100px;">우리는 하루에도 수만 가지 생각을 합니다. 그러나 뒤돌아서면 대부분 잊기 마련입니다. 스스로 생각한 것을 잊어버릴 때의 슬픔, 얼마나 마음 아픈지요. 그러한 슬픔을 조금이라도 줄이고자 작은 노력을 해 봅니다. 이제 날아가는 생각을 꺼냅니다. 옆으로 넘기면서 천천히 읽어 주세요.</textarea>
-      </div>
+    <div class="form-group">
+      <label for="subtextInput">표지 하단 서문 문구</label>
+      <textarea id="subtextInput" style="height: 100px;">우리는 하루에도 수만 가지 생각을 합니다. 그러나 뒤돌아서면 대부분 잊기 마련입니다. 스스로 생각한 것을 잊어버릴 때의 슬픔, 얼마나 마음 아픈지요. 그러한 슬픔을 조금이라도 줄이고자 작은 노력을 해 봅니다. 이제 날아가는 생각을 꺼냅니다. 옆으로 넘기면서 천천히 읽어 주세요.</textarea>
+    </div>
 
-      <div class="form-group">
-        <label>마지막 엔딩 프로필 변경 (자동 저장)</label>
-        <div class="file-input-wrapper">
-          <span id="fileLabel">프로필 이미지 선택 (깃허브 profile_dk.png 사용 중)</span>
-          <input type="file" id="profileUploader" accept="image/*">
-        </div>
+    <div class="form-group">
+      <label>마지막 엔딩 프로필 변경 (자동 저장)</label>
+      <div class="file-input-wrapper">
+        <span id="fileLabel">프로필 이미지 선택 (깃허브 profile_dk.png 사용 중)</span>
+        <input type="file" id="profileUploader" accept="image/*">
       </div>
     </div>
 
-    <!-- 좌측 최하단 상시 고정 버튼 -->
-    <div class="sidebar-footer">
-      <button id="zipBtn" class="btn-download-zip">전체 카드 ZIP 다운로드</button>
-    </div>
+    <button id="zipBtn" class="btn-download-zip">전체 카드 ZIP 다운로드</button>
   </div>
 
-  <!-- 우측 미리보기 영역 -->
+  <!-- 우측 미리보기 메인 영역 -->
   <div class="main-preview">
     <div id="previewContainer"></div>
   </div>
@@ -396,12 +382,6 @@
         const dateInput = document.getElementById('publishDate');
         if (dateInput && !dateInput.value) {
           dateInput.value = getFormattedDate();
-        }
-
-        const defaultText = `{제목 입력 칸입니다.}\n\n{본문 첫 단락 입력 칸입니다.}\n\n{본문 두번째 단락 입력 칸입니다.}`;
-        const textInput = document.getElementById('textInput');
-        if (textInput && !textInput.value) {
-          textInput.value = defaultText;
         }
 
         const uploaderElem = document.getElementById('profileUploader');
@@ -448,17 +428,21 @@
 
         const textEl = document.getElementById('textInput');
         const rawText = textEl ? textEl.value.trim() : '';
-        if (!rawText) return;
+        
+        // 원고가 완전히 비어있을 때 사용할 기본 예시 단락 지정
+        let paragraphs = rawText.split(/\n\s*\n/).filter(p => p.trim() !== '');
+        if (paragraphs.length === 0) {
+          paragraphs = ['{제목 입력 칸입니다.}', '{본문 내용을 입력해 주세요.}'];
+        }
 
-        const paragraphs = rawText.split(/\n\s*\n/).filter(p => p.trim() !== '');
         const category = (document.getElementById('categoryInput') || {}).value || '짧은 생각';
         const subtextRaw = (document.getElementById('subtextInput') || {}).value || '';
         const formattedSubtext = formatSubtext(subtextRaw);
         
-        const rawTitle = paragraphs[0] || '제목 없음';
+        const rawTitle = paragraphs[0] || '{제목 입력 칸입니다.}';
         const cleanHeaderTitle = rawTitle.replace(/\n/g, ' ');
 
-        // 1. 표지
+        // 1. 표지 (기본 1번)
         const coverWrap = createCardWrapper(1);
         const coverCard = coverWrap.querySelector('.card-preview');
         coverCard.className = 'card-preview card-cover';
@@ -475,7 +459,7 @@
         `;
         container.appendChild(coverWrap);
 
-        // 2. 본문
+        // 2. 본문 (기본 2번~)
         const bodyParagraphs = paragraphs.slice(1);
         bodyParagraphs.forEach((para, idx) => {
           const cardNum = idx + 2;
@@ -493,7 +477,7 @@
           container.appendChild(bodyWrap);
         });
 
-        // 3. 클로징
+        // 3. 클로징 (기본 마지막 번호)
         const lastCardNum = bodyParagraphs.length + 2;
         const closingWrap = createCardWrapper(lastCardNum);
         const closingCard = closingWrap.querySelector('.card-preview');
