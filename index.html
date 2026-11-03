@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>깃들다 | Author.yong | 카드뉴스 제작기</title>
+  <title>깃들다 GDD | 카드뉴스 생성기 (1080x1350 Exact Match)</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -305,7 +305,7 @@
       </div>
     </div>
 
-    <button class="btn-download-zip" onclick="downloadAllZip()">전체 카드 ZIP 다운로드</button>
+    <button id="zipBtn" class="btn-download-zip">전체 카드 ZIP 다운로드</button>
   </div>
 
   <div class="main-preview">
@@ -314,10 +314,8 @@
 
   <script>
     (function() {
-      // 대체용 SVG 이미지
       const fixedAvatarSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><path d="M 50 110 Q 50 70 100 70 Q 150 70 150 110 Q 150 155 100 155 Q 50 155 50 110 Z" fill="%23E8971B"/><path d="M 65 75 Q 100 50 135 75 A 35 35 0 0 0 65 75 Z" fill="%23FDFCF8" stroke="%23121212" stroke-width="3"/><path d="M 68 73 Q 80 60 100 73 Q 120 60 132 73" fill="none" stroke="%23121212" stroke-width="3"/><circle cx="78" cy="112" r="16" fill="none" stroke="%23121212" stroke-width="3"/><circle cx="122" cy="112" r="16" fill="none" stroke="%23121212" stroke-width="3"/><line x1="94" y1="112" x2="106" y2="112" stroke="%23121212" stroke-width="3"/><path d="M 62 112 L 50 108" stroke="%23121212" stroke-width="3"/><path d="M 138 112 L 150 108" stroke="%23121212" stroke-width="3"/><circle cx="78" cy="112" r="3" fill="%23121212"/><circle cx="122" cy="112" r="3" fill="%23121212"/><path d="M 70 93 Q 78 88 86 93" fill="none" stroke="%23121212" stroke-width="3"/><path d="M 114 93 Q 122 88 130 93" fill="none" stroke="%23121212" stroke-width="3"/><path d="M 100 112 Q 95 125 103 127" fill="none" stroke="%23121212" stroke-width="3"/><path d="M 90 145 Q 105 132 115 145" fill="none" stroke="%23121212" stroke-width="3.5" stroke-linecap="round"/></svg>`;
 
-      // 1순위: localStorage 커스텀 프로필, 2순위: 깃허브 저장소의 ./profile_dk.png
       let profileImgSrc = './profile_dk.png';
       try {
         const saved = localStorage.getItem('gdd_profile_img');
@@ -328,10 +326,19 @@
         }
       } catch(e){}
 
+      // 로컬 타임존 반영 YYYY-MM-DD 추출 함수
+      function getFormattedDate() {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      }
+
       function initApp() {
         const dateInput = document.getElementById('publishDate');
         if (dateInput && !dateInput.value) {
-          dateInput.value = new Date().toISOString().split('T')[0];
+          dateInput.value = getFormattedDate();
         }
 
         const defaultText = `{제목 입력 칸입니다.}\n\n{본문 첫 단락 입력 칸입니다.}\n\n{본문 두번째 단락 입력 칸입니다.}`;
@@ -356,6 +363,11 @@
               reader.readAsDataURL(file);
             }
           });
+        }
+
+        const zipBtn = document.getElementById('zipBtn');
+        if (zipBtn) {
+          zipBtn.addEventListener('click', downloadAllZip);
         }
 
         ['textInput', 'categoryInput', 'subtextInput', 'publishDate'].forEach(id => {
@@ -424,15 +436,24 @@
           container.appendChild(bodyWrap);
         });
 
-        // 3. 클로징
+        // 3. 클로징 (마지막 장)
         const lastCardNum = bodyParagraphs.length + 2;
         const closingWrap = createCardWrapper(lastCardNum);
         const closingCard = closingWrap.querySelector('.card-preview');
         closingCard.className = 'card-preview card-closing';
         closingCard.innerHTML = `
-          <img class="closing-profile-img" src="${profileImgSrc}" onerror="this.onerror=null; this.src='${fixedAvatarSVG}';">
+          <img class="closing-profile-img" src="${profileImgSrc}">
           <div class="closing-username">@AUTHOR.YONG</div>
         `;
+        
+        const closingImg = closingCard.querySelector('.closing-profile-img');
+        if (closingImg) {
+          closingImg.onerror = function() {
+            this.onerror = null;
+            this.src = fixedAvatarSVG;
+          };
+        }
+
         container.appendChild(closingWrap);
       }
 
@@ -451,7 +472,7 @@
         actionDiv.style.marginTop = '16px';
 
         const dateEl = document.getElementById('publishDate');
-        const dateVal = dateEl ? dateEl.value : '';
+        const dateVal = (dateEl && dateEl.value) ? dateEl.value : getFormattedDate();
         const fileName = `${dateVal}_${pageNum}.png`;
 
         const btn = document.createElement('button');
@@ -520,14 +541,14 @@
         return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
       }
 
-      window.downloadSingleCard = async function(cardElem, filename) {
+      async function downloadSingleCard(cardElem, filename) {
         const blob = await captureCardElement(cardElem);
         if (blob && typeof saveAs !== 'undefined') {
           saveAs(blob, filename);
         }
-      };
+      }
 
-      window.downloadAllZip = async function() {
+      async function downloadAllZip() {
         if (typeof JSZip === 'undefined' || typeof saveAs === 'undefined') {
           alert('압축 파일 라이브러리가 로드되지 않았습니다.');
           return;
@@ -535,8 +556,8 @@
         const zip = new JSZip();
         const cards = document.querySelectorAll('.card-preview');
         const dateEl = document.getElementById('publishDate');
-        const dateVal = dateEl ? dateEl.value : 'card';
-        const downloadBtn = document.querySelector('.btn-download-zip');
+        const dateVal = (dateEl && dateEl.value) ? dateEl.value : getFormattedDate();
+        const downloadBtn = document.getElementById('zipBtn');
 
         const originalText = downloadBtn ? downloadBtn.innerText : '';
         if (downloadBtn) downloadBtn.disabled = true;
@@ -557,7 +578,7 @@
           downloadBtn.innerText = originalText;
           downloadBtn.disabled = false;
         }
-      };
+      }
 
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initApp);
