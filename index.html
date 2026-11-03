@@ -1,448 +1,570 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>깃들다 GDD | 카드뉴스 생성기 (1080x1350 Exact Match)</title>
-​<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
-​<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-​<style>
-:root {
---bg-dark: #12151A;
---text-main: #E2E7ED;
---gold-point: #E5C158;
---font-myeongjo: 'Nanum Myeongjo', serif;
---font-sans: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
-}
-​* { box-sizing: border-box; margin: 0; padding: 0; }
-​body {
-font-family: var(--font-myeongjo);
-background-color: #08090b;
-color: #e0e0e0;
-display: flex;
-height: 100vh;
-overflow: hidden;
-}
-​.sidebar {
-width: 420px;
-background-color: #111418;
-border-right: 1px solid #22262d;
-display: flex;
-flex-direction: column;
-padding: 24px;
-overflow-y: auto;
-font-family: var(--font-sans);
-flex-shrink: 0;
-}
-​.brand-header {
-margin-bottom: 24px;
-padding-bottom: 16px;
-border-bottom: 1px solid #22262d;
-}
-​.brand-header h1 {
-font-family: var(--font-myeongjo);
-font-size: 20px;
-color: var(--gold-point);
-letter-spacing: 2px;
-}
-​.brand-header p {
-font-size: 12px;
-color: var(--text-main);
-opacity: 0.6;
-margin-top: 4px;
-}
-​.form-group { margin-bottom: 20px; }
-.form-group label {
-display: block;
-font-size: 13px;
-font-weight: 600;
-color: var(--gold-point);
-margin-bottom: 8px;
-}
-​input[type="text"], input[type="date"], textarea {
-width: 100%;
-padding: 10px 12px;
-background-color: #1a1e24;
-border: 1px solid #2c323b;
-border-radius: 6px;
-color: #fff;
-font-size: 14px;
-outline: none;
-font-family: var(--font-sans);
-}
-​textarea {
-height: 180px;
-resize: vertical;
-font-family: var(--font-myeongjo);
-line-height: 1.6;
-}
-​.file-input-wrapper {
-position: relative;
-background: #1a1e24;
-border: 1px dashed #2c323b;
-border-radius: 6px;
-padding: 12px;
-text-align: center;
-cursor: pointer;
-font-size: 13px;
-}
-​.file-input-wrapper input[type="file"] {
-position: absolute;
-top: 0; left: 0; width: 100%; height: 100%;
-opacity: 0;
-cursor: pointer;
-}
-​.btn-download-zip {
-background-color: var(--gold-point);
-color: #121212;
-font-family: var(--font-sans);
-font-weight: 700;
-border: none;
-padding: 14px;
-border-radius: 6px;
-cursor: pointer;
-font-size: 15px;
-margin-top: auto;
-}
-​.btn-download-zip:hover { opacity: 0.9; }
-​.main-preview {
-flex: 1;
-background-color: #050607;
-padding: 60px;
-overflow-y: auto;
-display: flex;
-flex-direction: column;
-align-items: center;
-gap: 50px;
-}
-​/* 1080x1350 카드 프레임 */
-.card-preview {
-width: 1080px;
-height: 1350px;
-background-color: #12151A;
-position: relative;
-box-shadow: 0 20px 60px rgba(0,0,0,0.8);
-flex-shrink: 0;
-overflow: hidden;
-font-family: var(--font-myeongjo);
-}
-​/* 1. 표지 */
-.card-cover .cover-header {
-position: absolute;
-top: 140px; left: 125px; right: 125px;
-display: flex; justify-content: space-between; align-items: flex-start;
-font-family: var(--font-myeongjo); font-size: 28px; color: var(--text-main);
-letter-spacing: 1px;
-}
-​.card-cover .cover-header .category-text { white-space: nowrap; }
-​.card-cover .cover-title-wrap {
-position: absolute;
-top: 310px; left: 125px; right: 125px; height: 350px;
-display: flex; flex-direction: column; justify-content: flex-end;
-}
-​.card-cover .cover-title {
-font-family: var(--font-myeongjo);
-font-size: 80px; font-weight: 800; color: var(--text-main);
-line-height: 1.4; word-break: keep-all; white-space: pre-wrap;
-letter-spacing: -1px;
-}
-​.card-cover .gold-line {
-position: absolute;
-top: 1060px; left: 125px; width: 180px; height: 1px;
-background-color: var(--gold-point);
-}
-​.card-cover .cover-subtext {
-position: absolute;
-bottom: 150px; left: 125px; right: 125px;
-font-family: var(--font-sans) !important;
-font-size: 20px; font-weight: 200; color: var(--text-main);
-line-height: 1.6; word-break: keep-all;
-text-align: justify;
-text-justify: inter-character;
-text-align-last: left;
-}
-​.card-cover .cover-subtext strong {
-font-family: var(--font-sans) !important; font-weight: 400 !important;
-}
-​/* 2. 본문 */
-.card-body-slide .body-header {
-position: absolute;
-top: 140px; left: 125px; right: 125px;
-font-family: var(--font-myeongjo); font-size: 24px; color: var(--text-main);
-white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-letter-spacing: 1px;
-}
-​.card-body-slide .body-content-wrap {
-position: absolute;
-top: 310px; left: 125px; right: 125px; bottom: 380px;
-overflow: hidden;
-}
-​.card-body-slide .body-text {
-font-family: var(--font-myeongjo);
-font-size: 32px; color: var(--text-main);
-line-height: 2.2; word-break: keep-all; white-space: pre-wrap;
-letter-spacing: -1px;
-text-align: justify;
-text-justify: inter-character;
-text-align-last: left;
-}
-​.card-body-slide .full-gold-line {
-position: absolute;
-top: 1060px; left: 125px; right: 125px; height: 1px;
-background-color: var(--gold-point);
-}
-​.card-body-slide .page-number {
-position: absolute;
-bottom: 150px; right: 125px;
-font-family: var(--font-myeongjo); font-size: 20px; color: var(--text-main);
-line-height: 1;
-}
-​/* 3. 클로징 */
-.card-closing {
-background-color: #12151A;
-display: flex; flex-direction: column; align-items: center;
-}
-​.card-closing .closing-profile-img {
-position: absolute;
-top: 510px; width: 270px; height: 255px;
-object-fit: contain;
-}
-​.card-closing .closing-username {
-position: absolute;
-top: 845px; left: 0; width: 100%;
-text-align: center; font-family: var(--font-myeongjo);
-font-size: 32px; color: #E2E7ED; letter-spacing: -0.5px;
-}
-​.btn-single-save {
-background-color: #22262d; color: #fff; border: none;
-padding: 10px 18px; border-radius: 6px;
-font-family: var(--font-sans); font-size: 14px; cursor: pointer;
-}
-​.btn-single-save:hover {
-background-color: var(--gold-point); color: #121212;
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>깃들다 | Author.yong | 카드뉴스 제작기</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+
+  <style>
+    :root {
+      --bg-dark: #12151A;
+      --text-main: #E2E7ED;
+      --gold-point: #E5C158;
+      --font-myeongjo: 'Nanum Myeongjo', serif, sans-serif;
+      --font-sans: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #08090b !important;
+    }
+
+    body {
+      font-family: var(--font-myeongjo);
+      color: #e0e0e0;
+      display: flex !important;
+      flex-direction: row !important;
+    }
+
+    .sidebar {
+      width: 420px;
+      height: 100vh;
+      background-color: #111418;
+      border-right: 1px solid #22262d;
+      display: flex;
+      flex-direction: column;
+      padding: 24px;
+      overflow-y: auto;
+      font-family: var(--font-sans);
+      flex-shrink: 0;
+      z-index: 10;
+    }
+
+    .brand-header {
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #22262d;
+    }
+
+    .brand-header h1 {
+      font-family: var(--font-myeongjo);
+      font-size: 20px;
+      color: var(--gold-point);
+      letter-spacing: 2px;
+    }
+
+    .brand-header p {
+      font-size: 12px;
+      color: var(--text-main);
+      opacity: 0.6;
+      margin-top: 4px;
+    }
+
+    .form-group { margin-bottom: 20px; }
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gold-point);
+      margin-bottom: 8px;
+    }
+
+    input[type="text"], input[type="date"], textarea {
+      width: 100%;
+      padding: 10px 12px;
+      background-color: #1a1e24;
+      border: 1px solid #2c323b;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+      font-family: var(--font-sans);
+    }
+
+    textarea {
+      height: 180px;
+      resize: vertical;
+      font-family: var(--font-myeongjo);
+      line-height: 1.6;
+    }
+
+    .file-input-wrapper {
+      position: relative;
+      background: #1a1e24;
+      border: 1px dashed #2c323b;
+      border-radius: 6px;
+      padding: 12px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .file-input-wrapper input[type="file"] {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .btn-download-zip {
+      background-color: var(--gold-point);
+      color: #121212;
+      font-family: var(--font-sans);
+      font-weight: 700;
+      border: none;
+      padding: 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 15px;
+      margin-top: auto;
+    }
+
+    .btn-download-zip:hover { opacity: 0.9; }
+
+    .main-preview {
+      flex: 1;
+      height: 100vh;
+      background-color: #050607;
+      padding: 60px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 50px;
+    }
+
+    .card-preview {
+      width: 1080px;
+      height: 1350px;
+      background-color: #12151A;
+      position: relative;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+      flex-shrink: 0;
+      overflow: hidden;
+      font-family: var(--font-myeongjo);
+    }
+
+    .card-cover .cover-header {
+      position: absolute;
+      top: 140px; left: 125px; right: 125px;
+      display: flex; justify-content: space-between; align-items: flex-start;
+      font-family: var(--font-myeongjo); font-size: 28px; color: var(--text-main);
+      letter-spacing: 1px;
+    }
+
+    .card-cover .cover-header .category-text { white-space: nowrap; }
+
+    .card-cover .cover-title-wrap {
+      position: absolute;
+      top: 310px; left: 125px; right: 125px; height: 350px;
+      display: flex; flex-direction: column; justify-content: flex-end;
+    }
+
+    .card-cover .cover-title {
+      font-family: var(--font-myeongjo);
+      font-size: 80px; font-weight: 800; color: var(--text-main);
+      line-height: 1.4; word-break: keep-all; white-space: pre-wrap;
+      letter-spacing: -1px;
+    }
+
+    .card-cover .gold-line {
+      position: absolute;
+      top: 1060px; left: 125px; width: 180px; height: 1px;
+      background-color: var(--gold-point);
+    }
+
+    .card-cover .cover-subtext {
+      position: absolute;
+      bottom: 150px; left: 125px; right: 125px;
+      font-family: var(--font-sans) !important;
+      font-size: 20px; font-weight: 200; color: var(--text-main);
+      line-height: 1.6; word-break: keep-all;
+      text-align: justify;
+      text-justify: inter-character;
+      text-align-last: left;
+    }
+
+    .card-cover .cover-subtext strong {
+      font-family: var(--font-sans) !important; font-weight: 400 !important;
+    }
+
+    .card-body-slide .body-header {
+      position: absolute;
+      top: 140px; left: 125px; right: 125px;
+      font-family: var(--font-myeongjo); font-size: 24px; color: var(--text-main);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      letter-spacing: 1px;
+    }
+
+    .card-body-slide .body-content-wrap {
+      position: absolute;
+      top: 310px; left: 125px; right: 125px; bottom: 380px;
+      overflow: hidden;
+    }
+
+    .card-body-slide .body-text {
+      font-family: var(--font-myeongjo);
+      font-size: 32px; color: var(--text-main);
+      line-height: 2.2; word-break: keep-all; white-space: pre-wrap;
+      letter-spacing: -1px;
+      text-align: justify;
+      text-justify: inter-character;
+      text-align-last: left;
+    }
+
+    .card-body-slide .full-gold-line {
+      position: absolute;
+      top: 1060px; left: 125px; right: 125px; height: 1px;
+      background-color: var(--gold-point);
+    }
+
+    .card-body-slide .page-number {
+      position: absolute;
+      bottom: 150px; right: 125px;
+      font-family: var(--font-myeongjo); font-size: 20px; color: var(--text-main);
+      line-height: 1;
+    }
+
+    .card-closing {
+      background-color: #12151A;
+      display: flex; flex-direction: column; align-items: center;
+    }
+
+    .card-closing .closing-profile-img {
+      position: absolute;
+      top: 510px; width: 270px; height: 255px;
+      object-fit: contain;
+    }
+
+    .card-closing .closing-username {
+      position: absolute;
+      top: 845px; left: 0; width: 100%;
+      text-align: center; font-family: var(--font-myeongjo);
+      font-size: 32px; color: #E2E7ED; letter-spacing: -0.5px;
+    }
+
+    .btn-single-save {
+      background-color: #22262d; color: #fff; border: none;
+      padding: 10px 18px; border-radius: 6px;
+      font-family: var(--font-sans); font-size: 14px; cursor: pointer;
+    }
+
+    .btn-single-save:hover {
+      background-color: var(--gold-point); color: #121212;
+    }
+  </style>
 </head>
 <body>
-​<div class="sidebar">
-<div class="brand-header">
-<h1>깃들다 GDD</h1>
-<p>단어를 잇다. 문장을 붙이다. 책을 짓다.</p>
-</div>
-​<div class="form-group">
-<label for="publishDate">발행 날짜 (파일명용)</label>
-<input type="date" id="publishDate">
-</div>
-​<div class="form-group">
-<label for="categoryInput">상단 카테고리 문구</label>
-<input type="text" id="categoryInput" value="짧은 생각">
-</div>
-​<div class="form-group">
-<label for="textInput">원고 입력 (첫 단락=제목 / 줄바꿈 엔터 지원)</label>
-<textarea id="textInput" placeholder="첫 번째 단락은 [제목]입니다.&#10;&#10;두 번째 단락부터는 [본문]입니다."></textarea>
-</div>
-​<div class="form-group">
-<label for="subtextInput">표지 하단 서문 문구</label>
-<textarea id="subtextInput" style="height: 100px;">우리는 하루에도 수만 가지 생각을 합니다. 그러나 뒤돌아서면 대부분 잊기 마련입니다. 스스로 생각한 것을 잊어버릴 때의 슬픔, 얼마나 마음 아픈지요. 그러한 슬픔을 조금이라도 줄이고자 작은 노력을 해 봅니다. 이제 날아가는 생각을 꺼냅니다. 옆으로 넘기면서 천천히 읽어 주세요.</textarea>
-</div>
-​<div class="form-group">
-<label>마지막 엔딩 프로필 변경 (자동 저장)</label>
-<div class="file-input-wrapper">
-<span id="fileLabel">프로필 이미지 선택 (한 번 올리면 자동 저장됨)</span>
-<input type="file" id="profileUploader" accept="image/*">
-</div>
-</div>
-​<button class="btn-download-zip" onclick="downloadAllZip()">전체 카드 ZIP 다운로드</button>
-</div>
-​<div class="main-preview">
-<div id="previewContainer" style="display: flex; flex-direction: column; align-items: center; gap: 40px;"></div>
-</div>
-​<script>
-const fixedAvatarSVG = data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><path d="M 50 110 Q 50 70 100 70 Q 150 70 150 110 Q 150 155 100 155 Q 50 155 50 110 Z" fill="%23E8971B"/><path d="M 65 75 Q 100 50 135 75 A 35 35 0 0 0 65 75 Z" fill="%23FDFCF8" stroke="%23121212" stroke-width="3"/><path d="M 68 73 Q 80 60 100 73 Q 120 60 132 73" fill="none" stroke="%23121212" stroke-width="3"/><circle cx="78" cy="112" r="16" fill="none" stroke="%23121212" stroke-width="3"/><circle cx="122" cy="112" r="16" fill="none" stroke="%23121212" stroke-width="3"/><line x1="94" y1="112" x2="106" y2="112" stroke="%23121212" stroke-width="3"/><path d="M 62 112 L 50 108" stroke="%23121212" stroke-width="3"/><path d="M 138 112 L 150 108" stroke="%23121212" stroke-width="3"/><circle cx="78" cy="112" r="3" fill="%23121212"/><circle cx="122" cy="112" r="3" fill="%23121212"/><path d="M 70 93 Q 78 88 86 93" fill="none" stroke="%23121212" stroke-width="3"/><path d="M 114 93 Q 122 88 130 93" fill="none" stroke="%23121212" stroke-width="3"/><path d="M 100 112 Q 95 125 103 127" fill="none" stroke="%23121212" stroke-width="3"/><path d="M 90 145 Q 105 132 115 145" fill="none" stroke="%23121212" stroke-width="3.5" stroke-linecap="round"/></svg>;
-​let profileImgSrc = fixedAvatarSVG;
-try {
-const savedProfile = localStorage.getItem('gdd_profile_img');
-if (savedProfile) {
-profileImgSrc = savedProfile;
-const fileLabel = document.getElementById('fileLabel');
-if (fileLabel) fileLabel.innerText = "저장된 커스텀 프로필 사용 중 (클릭 시 교체)";
-}
-} catch(e) {}
-​const dateInput = document.getElementById('publishDate');
-if (dateInput) {
-dateInput.value = new Date().toISOString().split('T')[0];
-dateInput.addEventListener('change', renderCards);
-}
-​const defaultText = `{제목 입력 칸입니다.}
-​{본문 첫 단락 입력 칸입니다.}
-​{본문 두번째 단락 입력 칸입니다.}`;
-​const textInputElem = document.getElementById('textInput');
-if (textInputElem) {
-textInputElem.value = defaultText;
-textInputElem.addEventListener('input', renderCards);
-}
-​const uploaderElem = document.getElementById('profileUploader');
-if (uploaderElem) {
-uploaderElem.addEventListener('change', function(e) {
-const file = e.target.files[0];
-if (file) {
-const reader = new FileReader();
-reader.onload = function(evt) {
-profileImgSrc = evt.target.result;
-try { localStorage.setItem('gdd_profile_img', profileImgSrc); } catch(e){}
-renderCards();
-};
-reader.readAsDataURL(file);
-}
-});
-}
-​const categoryElem = document.getElementById('categoryInput');
-if (categoryElem) categoryElem.addEventListener('input', renderCards);
-​const subtextElem = document.getElementById('subtextInput');
-if (subtextElem) subtextElem.addEventListener('input', renderCards);
-​function formatSubtext(str) {
-if (!str) return '';
-const targetPattern = /옆으로\s넘기면서\s(천천히\s*)?읽어\s*주세요./g;
-return str.replace(targetPattern, (match) => <strong>${match}</strong>);
-}
-​function renderCards() {
-const container = document.getElementById('previewContainer');
-if (!container) return;
-container.innerHTML = '';
-​const textVal = document.getElementById('textInput') ? document.getElementById('textInput').value : '';
-const rawText = textVal.trim();
-if (!rawText) return;
-​const paragraphs = rawText.split(/\n\s*\n/).filter(p => p.trim() !== '');
-const category = (document.getElementById('categoryInput') && document.getElementById('categoryInput').value) || '짧은 생각';
-const subtextRaw = (document.getElementById('subtextInput') && document.getElementById('subtextInput').value) || '';
-const formattedSubtext = formatSubtext(subtextRaw);
-​const rawTitle = paragraphs[0] || '제목 없음';
-const cleanHeaderTitle = rawTitle.replace(/\n/g, ' ');
-​// 1. 표지
-const coverWrap = createCardWrapper(1);
-const coverCard = coverWrap.querySelector('.card-preview');
-coverCard.className = 'card-preview card-cover';
-coverCard.innerHTML = <div class="cover-header"> <span>@AUTHOR.YONG</span> <span class="category-text">${category}</span> </div> <div class="cover-title-wrap"> <div class="cover-title">${rawTitle}</div> </div> <div class="gold-line"></div> <div class="cover-subtext">${formattedSubtext}</div>;
-container.appendChild(coverWrap);
-​// 2. 본문
-const bodyParagraphs = paragraphs.slice(1);
-bodyParagraphs.forEach((para, idx) => {
-const cardNum = idx + 2;
-const bodyWrap = createCardWrapper(cardNum);
-const bodyCard = bodyWrap.querySelector('.card-preview');
-bodyCard.className = 'card-preview card-body-slide';
-bodyCard.innerHTML = <div class="body-header">${cleanHeaderTitle}</div> <div class="body-content-wrap"> <div class="body-text">${para.trim()}</div> </div> <div class="full-gold-line"></div> <div class="page-number">${idx + 1}</div>;
-container.appendChild(bodyWrap);
-});
-​// 3. 클로징
-const lastCardNum = bodyParagraphs.length + 2;
-const closingWrap = createCardWrapper(lastCardNum);
-const closingCard = closingWrap.querySelector('.card-preview');
-closingCard.className = 'card-preview card-closing';
-closingCard.innerHTML = <img class="closing-profile-img" src="${profileImgSrc}"> <div class="closing-username">@AUTHOR.YONG</div>;
-container.appendChild(closingWrap);
-}
-​function createCardWrapper(pageNum) {
-const wrapper = document.createElement('div');
-wrapper.style.display = 'flex';
-wrapper.style.flexDirection = 'column';
-wrapper.style.alignItems = 'center';
-​const card = document.createElement('div');
-card.className = 'card-preview';
-card.id = card-elem-${pageNum};
-​const actionDiv = document.createElement('div');
-actionDiv.className = 'card-actions';
-actionDiv.style.marginTop = '16px';
-​const dateVal = document.getElementById('publishDate') ? document.getElementById('publishDate').value : '';
-const fileName = ${dateVal}_${pageNum}.png;
-​const btn = document.createElement('button');
-btn.className = 'btn-single-save';
-btn.innerText = ${fileName} 저장;
-btn.onclick = () => downloadSingleCard(card, fileName);
-​actionDiv.appendChild(btn);
-wrapper.appendChild(card);
-wrapper.appendChild(actionDiv);
-​return wrapper;
-}
-​async function captureCardElement(cardElem) {
-if (document.fonts && document.fonts.ready) {
-await document.fonts.ready;
-}
-​const images = cardElem.querySelectorAll('img');
-const imagePromises = Array.from(images).map(img => {
-if (img.complete) return Promise.resolve();
-return new Promise(resolve => {
-img.onload = resolve;
-img.onerror = resolve;
-});
-});
-await Promise.all(imagePromises);
-​const clone = cardElem.cloneNode(true);
-​Object.assign(clone.style, {
-position: 'fixed',
-left: '0px',
-top: '0px',
-zIndex: '-99999',
-width: '1080px',
-height: '1350px',
-boxShadow: 'none',
-transform: 'none',
-margin: '0',
-padding: '0',
-backgroundColor: '#12151A'
-});
-​document.body.appendChild(clone);
-​const canvas = await html2canvas(clone, {
-width: 1080,
-height: 1350,
-scale: 1,
-backgroundColor: '#12151A',
-useCORS: true,
-allowTaint: true,
-scrollX: 0,
-scrollY: 0,
-windowWidth: 1080,
-windowHeight: 1350,
-x: 0,
-y: 0
-});
-​document.body.removeChild(clone);
-​return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-}
-​async function downloadSingleCard(cardElem, filename) {
-const blob = await captureCardElement(cardElem);
-saveAs(blob, filename);
-}
-​async function downloadAllZip() {
-const zip = new JSZip();
-const cards = document.querySelectorAll('.card-preview');
-const dateVal = document.getElementById('publishDate') ? document.getElementById('publishDate').value : '';
-const downloadBtn = document.querySelector('.btn-download-zip');
-​const originalText = downloadBtn ? downloadBtn.innerText : '';
-if (downloadBtn) downloadBtn.disabled = true;
-​for (let i = 0; i < cards.length; i++) {
-if (downloadBtn) downloadBtn.innerText = 캡처 중... (${i + 1}/${cards.length});
-await new Promise(r => setTimeout(r, 50));
-​const cardElem = cards[i];
-const blob = await captureCardElement(cardElem);
-zip.file(${dateVal}_${i + 1}.png, blob);
-}
-​if (downloadBtn) downloadBtn.innerText = '압축 파일 생성 중...';
-const zipBlob = await zip.generateAsync({ type: 'blob' });
-saveAs(zipBlob, ${dateVal}_카드뉴스.zip);
-​if (downloadBtn) {
-downloadBtn.innerText = originalText;
-downloadBtn.disabled = false;
-}
-}
-​// 초기 실행
-document.addEventListener('DOMContentLoaded', renderCards);
-renderCards();
-</script>
+
+  <div class="sidebar">
+    <div class="brand-header">
+      <h1>깃들다 GDD</h1>
+      <p>단어를 잇다. 문장을 붙이다. 책을 짓다.</p>
+    </div>
+
+    <div class="form-group">
+      <label for="publishDate">발행 날짜 (파일명용)</label>
+      <input type="date" id="publishDate">
+    </div>
+
+    <div class="form-group">
+      <label for="categoryInput">상단 카테고리 문구</label>
+      <input type="text" id="categoryInput" value="짧은 생각">
+    </div>
+
+    <div class="form-group">
+      <label for="textInput">원고 입력 (첫 단락=제목 / 줄바꿈 엔터 지원)</label>
+      <textarea id="textInput" placeholder="첫 번째 단락은 [제목]입니다.&#10;&#10;두 번째 단락부터는 [본문]입니다."></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="subtextInput">표지 하단 서문 문구</label>
+      <textarea id="subtextInput" style="height: 100px;">우리는 하루에도 수만 가지 생각을 합니다. 그러나 뒤돌아서면 대부분 잊기 마련입니다. 스스로 생각한 것을 잊어버릴 때의 슬픔, 얼마나 마음 아픈지요. 그러한 슬픔을 조금이라도 줄이고자 작은 노력을 해 봅니다. 이제 날아가는 생각을 꺼냅니다. 옆으로 넘기면서 천천히 읽어 주세요.</textarea>
+    </div>
+
+    <div class="form-group">
+      <label>마지막 엔딩 프로필 변경 (자동 저장)</label>
+      <div class="file-input-wrapper">
+        <span id="fileLabel">프로필 이미지 선택 (깃허브 profile_dk.png 사용 중)</span>
+        <input type="file" id="profileUploader" accept="image/*">
+      </div>
+    </div>
+
+    <button class="btn-download-zip" onclick="downloadAllZip()">전체 카드 ZIP 다운로드</button>
+  </div>
+
+  <div class="main-preview">
+    <div id="previewContainer" style="display: flex; flex-direction: column; align-items: center; gap: 40px;"></div>
+  </div>
+
+  <script>
+    (function() {
+      // 대체용 SVG 이미지
+      const fixedAvatarSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><path d="M 50 110 Q 50 70 100 70 Q 150 70 150 110 Q 150 155 100 155 Q 50 155 50 110 Z" fill="%23E8971B"/><path d="M 65 75 Q 100 50 135 75 A 35 35 0 0 0 65 75 Z" fill="%23FDFCF8" stroke="%23121212" stroke-width="3"/><path d="M 68 73 Q 80 60 100 73 Q 120 60 132 73" fill="none" stroke="%23121212" stroke-width="3"/><circle cx="78" cy="112" r="16" fill="none" stroke="%23121212" stroke-width="3"/><circle cx="122" cy="112" r="16" fill="none" stroke="%23121212" stroke-width="3"/><line x1="94" y1="112" x2="106" y2="112" stroke="%23121212" stroke-width="3"/><path d="M 62 112 L 50 108" stroke="%23121212" stroke-width="3"/><path d="M 138 112 L 150 108" stroke="%23121212" stroke-width="3"/><circle cx="78" cy="112" r="3" fill="%23121212"/><circle cx="122" cy="112" r="3" fill="%23121212"/><path d="M 70 93 Q 78 88 86 93" fill="none" stroke="%23121212" stroke-width="3"/><path d="M 114 93 Q 122 88 130 93" fill="none" stroke="%23121212" stroke-width="3"/><path d="M 100 112 Q 95 125 103 127" fill="none" stroke="%23121212" stroke-width="3"/><path d="M 90 145 Q 105 132 115 145" fill="none" stroke="%23121212" stroke-width="3.5" stroke-linecap="round"/></svg>`;
+
+      // 1순위: localStorage 커스텀 프로필, 2순위: 깃허브 저장소의 ./profile_dk.png
+      let profileImgSrc = './profile_dk.png';
+      try {
+        const saved = localStorage.getItem('gdd_profile_img');
+        if (saved) {
+          profileImgSrc = saved;
+          const fileLabel = document.getElementById('fileLabel');
+          if (fileLabel) fileLabel.innerText = "저장된 커스텀 프로필 사용 중";
+        }
+      } catch(e){}
+
+      function initApp() {
+        const dateInput = document.getElementById('publishDate');
+        if (dateInput && !dateInput.value) {
+          dateInput.value = new Date().toISOString().split('T')[0];
+        }
+
+        const defaultText = `{제목 입력 칸입니다.}\n\n{본문 첫 단락 입력 칸입니다.}\n\n{본문 두번째 단락 입력 칸입니다.}`;
+        const textInput = document.getElementById('textInput');
+        if (textInput && !textInput.value) {
+          textInput.value = defaultText;
+        }
+
+        const uploaderElem = document.getElementById('profileUploader');
+        if (uploaderElem) {
+          uploaderElem.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+              const reader = new FileReader();
+              reader.onload = function(evt) {
+                profileImgSrc = evt.target.result;
+                try { localStorage.setItem('gdd_profile_img', profileImgSrc); } catch(err){}
+                const fileLabel = document.getElementById('fileLabel');
+                if (fileLabel) fileLabel.innerText = "커스텀 프로필 교체 완료";
+                renderCards();
+              };
+              reader.readAsDataURL(file);
+            }
+          });
+        }
+
+        ['textInput', 'categoryInput', 'subtextInput', 'publishDate'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.addEventListener('input', renderCards);
+        });
+
+        renderCards();
+      }
+
+      function formatSubtext(str) {
+        if (!str) return '';
+        const targetPattern = /옆으로\s*넘기면서\s*(천천히\s*)?읽어\s*주세요\./g;
+        return str.replace(targetPattern, (match) => `<strong>${match}</strong>`);
+      }
+
+      function renderCards() {
+        const container = document.getElementById('previewContainer');
+        if (!container) return;
+        container.innerHTML = '';
+
+        const textEl = document.getElementById('textInput');
+        const rawText = textEl ? textEl.value.trim() : '';
+        if (!rawText) return;
+
+        const paragraphs = rawText.split(/\n\s*\n/).filter(p => p.trim() !== '');
+        const category = (document.getElementById('categoryInput') || {}).value || '짧은 생각';
+        const subtextRaw = (document.getElementById('subtextInput') || {}).value || '';
+        const formattedSubtext = formatSubtext(subtextRaw);
+        
+        const rawTitle = paragraphs[0] || '제목 없음';
+        const cleanHeaderTitle = rawTitle.replace(/\n/g, ' ');
+
+        // 1. 표지
+        const coverWrap = createCardWrapper(1);
+        const coverCard = coverWrap.querySelector('.card-preview');
+        coverCard.className = 'card-preview card-cover';
+        coverCard.innerHTML = `
+          <div class="cover-header">
+            <span>@AUTHOR.YONG</span>
+            <span class="category-text">${category}</span>
+          </div>
+          <div class="cover-title-wrap">
+            <div class="cover-title">${rawTitle}</div>
+          </div>
+          <div class="gold-line"></div>
+          <div class="cover-subtext">${formattedSubtext}</div>
+        `;
+        container.appendChild(coverWrap);
+
+        // 2. 본문
+        const bodyParagraphs = paragraphs.slice(1);
+        bodyParagraphs.forEach((para, idx) => {
+          const cardNum = idx + 2;
+          const bodyWrap = createCardWrapper(cardNum);
+          const bodyCard = bodyWrap.querySelector('.card-preview');
+          bodyCard.className = 'card-preview card-body-slide';
+          bodyCard.innerHTML = `
+            <div class="body-header">${cleanHeaderTitle}</div>
+            <div class="body-content-wrap">
+              <div class="body-text">${para.trim()}</div>
+            </div>
+            <div class="full-gold-line"></div>
+            <div class="page-number">${idx + 1}</div>
+          `;
+          container.appendChild(bodyWrap);
+        });
+
+        // 3. 클로징
+        const lastCardNum = bodyParagraphs.length + 2;
+        const closingWrap = createCardWrapper(lastCardNum);
+        const closingCard = closingWrap.querySelector('.card-preview');
+        closingCard.className = 'card-preview card-closing';
+        closingCard.innerHTML = `
+          <img class="closing-profile-img" src="${profileImgSrc}" onerror="this.onerror=null; this.src='${fixedAvatarSVG}';">
+          <div class="closing-username">@AUTHOR.YONG</div>
+        `;
+        container.appendChild(closingWrap);
+      }
+
+      function createCardWrapper(pageNum) {
+        const wrapper = document.createElement('div');
+        wrapper.style.display = 'flex';
+        wrapper.style.flexDirection = 'column';
+        wrapper.style.alignItems = 'center';
+
+        const card = document.createElement('div');
+        card.className = 'card-preview';
+        card.id = `card-elem-${pageNum}`;
+
+        const actionDiv = document.createElement('div');
+        actionDiv.className = 'card-actions';
+        actionDiv.style.marginTop = '16px';
+
+        const dateEl = document.getElementById('publishDate');
+        const dateVal = dateEl ? dateEl.value : '';
+        const fileName = `${dateVal}_${pageNum}.png`;
+
+        const btn = document.createElement('button');
+        btn.className = 'btn-single-save';
+        btn.innerText = `${fileName} 저장`;
+        btn.onclick = () => downloadSingleCard(card, fileName);
+
+        actionDiv.appendChild(btn);
+        wrapper.appendChild(card);
+        wrapper.appendChild(actionDiv);
+
+        return wrapper;
+      }
+
+      async function captureCardElement(cardElem) {
+        if (typeof html2canvas === 'undefined') {
+          alert('이미지 저장 라이브러리가 준비되지 않았습니다. 페이지를 새로고침해 주세요.');
+          return null;
+        }
+
+        try { await document.fonts.ready; } catch(e){}
+
+        const images = cardElem.querySelectorAll('img');
+        const imagePromises = Array.from(images).map(img => {
+          if (img.complete) return Promise.resolve();
+          return new Promise(resolve => {
+            img.onload = resolve;
+            img.onerror = resolve;
+          });
+        });
+        await Promise.all(imagePromises);
+
+        const clone = cardElem.cloneNode(true);
+        Object.assign(clone.style, {
+          position: 'fixed',
+          left: '0px',
+          top: '0px',
+          zIndex: '-99999',
+          width: '1080px',
+          height: '1350px',
+          boxShadow: 'none',
+          transform: 'none',
+          margin: '0',
+          padding: '0',
+          backgroundColor: '#12151A'
+        });
+
+        document.body.appendChild(clone);
+
+        const canvas = await html2canvas(clone, {
+          width: 1080,
+          height: 1350,
+          scale: 1,
+          backgroundColor: '#12151A',
+          useCORS: true,
+          allowTaint: true,
+          scrollX: 0,
+          scrollY: 0,
+          windowWidth: 1080,
+          windowHeight: 1350,
+          x: 0,
+          y: 0
+        });
+
+        document.body.removeChild(clone);
+        return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+      }
+
+      window.downloadSingleCard = async function(cardElem, filename) {
+        const blob = await captureCardElement(cardElem);
+        if (blob && typeof saveAs !== 'undefined') {
+          saveAs(blob, filename);
+        }
+      };
+
+      window.downloadAllZip = async function() {
+        if (typeof JSZip === 'undefined' || typeof saveAs === 'undefined') {
+          alert('압축 파일 라이브러리가 로드되지 않았습니다.');
+          return;
+        }
+        const zip = new JSZip();
+        const cards = document.querySelectorAll('.card-preview');
+        const dateEl = document.getElementById('publishDate');
+        const dateVal = dateEl ? dateEl.value : 'card';
+        const downloadBtn = document.querySelector('.btn-download-zip');
+
+        const originalText = downloadBtn ? downloadBtn.innerText : '';
+        if (downloadBtn) downloadBtn.disabled = true;
+
+        for (let i = 0; i < cards.length; i++) {
+          if (downloadBtn) downloadBtn.innerText = `캡처 중... (${i + 1}/${cards.length})`;
+          await new Promise(r => setTimeout(r, 50));
+          
+          const blob = await captureCardElement(cards[i]);
+          if (blob) zip.file(`${dateVal}_${i + 1}.png`, blob);
+        }
+
+        if (downloadBtn) downloadBtn.innerText = '압축 파일 생성 중...';
+        const zipBlob = await zip.generateAsync({ type: 'blob' });
+        saveAs(zipBlob, `${dateVal}_카드뉴스.zip`);
+
+        if (downloadBtn) {
+          downloadBtn.innerText = originalText;
+          downloadBtn.disabled = false;
+        }
+      };
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initApp);
+      } else {
+        initApp();
+      }
+    })();
+  </script>
 </body>
 </html>
