@@ -41,7 +41,7 @@
       flex-direction: row !important;
     }
 
-    /* 좌측 컨트롤 사이드바 고정 패널 */
+    /* 좌측 고정 패널 */
     .sidebar {
       width: 420px;
       height: 100vh;
@@ -52,13 +52,13 @@
       font-family: var(--font-sans);
       flex-shrink: 0;
       z-index: 10;
-      position: relative;
     }
 
+    /* 폼 영역만 세로 스크롤 처리 */
     .sidebar-content {
-      height: calc(100vh - 90px);
+      flex: 1;
       overflow-y: auto;
-      padding: 24px 24px 10px 24px;
+      padding: 24px;
     }
 
     .brand-header {
@@ -103,7 +103,7 @@
     }
 
     textarea {
-      height: 150px;
+      height: 140px;
       resize: vertical;
       font-family: var(--font-myeongjo);
       line-height: 1.6;
@@ -127,26 +127,22 @@
       cursor: pointer;
     }
 
-    /* 하단 완전 고정 다운로드 영역 */
+    /* 좌측 최하단 상시 고정 버튼 영역 */
     .sidebar-footer {
-      height: 90px;
       padding: 16px 24px;
       background-color: #111418;
       border-top: 1px solid #22262d;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       flex-shrink: 0;
     }
 
     .btn-download-zip {
       width: 100%;
-      height: 100%;
       background-color: var(--gold-point);
       color: #121212;
       font-family: var(--font-sans);
       font-weight: 700;
       border: none;
+      padding: 14px;
       border-radius: 6px;
       cursor: pointer;
       font-size: 15px;
@@ -154,7 +150,7 @@
 
     .btn-download-zip:hover { opacity: 0.9; }
 
-    /* 우측 메인 영역: 3열 격자(Grid) 구조 */
+    /* 우측 메인 영역 (3열 배치 & 스크롤) */
     .main-preview {
       flex: 1;
       height: 100vh;
@@ -203,7 +199,7 @@
       font-family: var(--font-myeongjo);
     }
 
-    /* 1. 표지 디자인 */
+    /* 표지 */
     .card-cover .cover-header {
       position: absolute;
       top: 140px; left: 125px; right: 125px;
@@ -248,7 +244,7 @@
       font-family: var(--font-sans) !important; font-weight: 400 !important;
     }
 
-    /* 2. 본문 디자인 */
+    /* 본문 */
     .card-body-slide .body-header {
       position: absolute;
       top: 140px; left: 125px; right: 125px;
@@ -286,7 +282,7 @@
       line-height: 1;
     }
 
-    /* 3. 클로징 디자인 */
+    /* 클로징 */
     .card-closing {
       background-color: #12151A;
       display: flex; flex-direction: column; align-items: center;
@@ -305,7 +301,7 @@
       font-size: 32px; color: #E2E7ED; letter-spacing: -0.5px;
     }
 
-    /* 하단 단일 카드 저장 버튼 */
+    /* 하단 저장 버튼 */
     .card-actions {
       margin-top: 12px;
       width: 100%;
@@ -326,7 +322,7 @@
 </head>
 <body>
 
-  <!-- 좌측 컨트롤 사이드바 -->
+  <!-- 좌측 컨트롤 패널 -->
   <div class="sidebar">
     <div class="sidebar-content">
       <div class="brand-header">
@@ -363,13 +359,13 @@
       </div>
     </div>
 
-    <!-- 하단 고정 ZIP 다운로드 버튼 영역 -->
+    <!-- 좌측 최하단 상시 고정 버튼 -->
     <div class="sidebar-footer">
       <button id="zipBtn" class="btn-download-zip">전체 카드 ZIP 다운로드</button>
     </div>
   </div>
 
-  <!-- 우측 3열 미리보기 메인 영역 -->
+  <!-- 우측 미리보기 영역 -->
   <div class="main-preview">
     <div id="previewContainer"></div>
   </div>
