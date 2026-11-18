@@ -29,8 +29,8 @@
 
     /* 라이트모드 변수 오버라이드 */
     body.theme-light {
-      --card-bg: #F8F7F3;
-      --card-text: #1A1D24;
+      --card-bg: #FDFCF8;
+      --card-text: #1B1E23;
       --card-point: #B88B14;
     }
 
@@ -631,7 +631,7 @@
         await Promise.all(imagePromises);
 
         // 현재 테마에 맞는 배경색 가져오기
-        const activeBgColor = currentTheme === 'light' ? '#F8F7F3' : '#12151A';
+        const activeBgColor = currentTheme === 'light' ? '#FDFCF8' : '#12151A';
 
         const clone = cardElem.cloneNode(true);
         Object.assign(clone.style, {
