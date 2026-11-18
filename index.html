@@ -16,11 +16,22 @@
 
   <style>
     :root {
-      --bg-dark: #12151A;
-      --text-main: #E2E7ED;
-      --gold-point: #E5C158;
+      /* UI 기본 컬러 */
+      --ui-gold: #E5C158;
       --font-myeongjo: 'Nanum Myeongjo', serif, sans-serif;
       --font-sans: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+
+      /* 카드뉴스 테마 변수 (기본값: 다크모드) */
+      --card-bg: #12151A;
+      --card-text: #E2E7ED;
+      --card-point: #E5C158;
+    }
+
+    /* 라이트모드 변수 오버라이드 */
+    body.theme-light {
+      --card-bg: #F8F7F3;
+      --card-text: #1A1D24;
+      --card-point: #B88B14;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -65,13 +76,13 @@
     .brand-header h1 {
       font-family: var(--font-myeongjo);
       font-size: 20px;
-      color: var(--gold-point);
+      color: var(--ui-gold);
       letter-spacing: 2px;
     }
 
     .brand-header p {
       font-size: 12px;
-      color: var(--text-main);
+      color: #E2E7ED;
       opacity: 0.6;
       margin-top: 4px;
     }
@@ -81,8 +92,34 @@
       display: block;
       font-size: 13px;
       font-weight: 600;
-      color: var(--gold-point);
+      color: var(--ui-gold);
       margin-bottom: 8px;
+    }
+
+    /* 테마 전환 버튼 그룹 */
+    .theme-selector {
+      display: flex;
+      gap: 8px;
+    }
+
+    .theme-btn {
+      flex: 1;
+      padding: 10px;
+      background-color: #1a1e24;
+      border: 1px solid #2c323b;
+      border-radius: 6px;
+      color: #9ba1a6;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .theme-btn.active {
+      background-color: var(--ui-gold);
+      color: #121212;
+      border-color: var(--ui-gold);
     }
 
     input[type="text"], input[type="date"], textarea {
@@ -125,7 +162,7 @@
     /* 사이드바 일괄 다운로드 버튼 */
     .btn-download-zip {
       width: 100%;
-      background-color: var(--gold-point);
+      background-color: var(--ui-gold);
       color: #121212;
       font-family: var(--font-sans);
       font-weight: 700;
@@ -181,13 +218,14 @@
     .card-preview {
       width: 1080px;
       height: 1350px;
-      background-color: #12151A;
+      background-color: var(--card-bg);
       position: absolute;
       top: 0;
       left: 0;
       transform-origin: top left;
       transform: scale(0.3);
       font-family: var(--font-myeongjo);
+      transition: background-color 0.2s ease;
     }
 
     /* 1. 표지 */
@@ -195,7 +233,7 @@
       position: absolute;
       top: 140px; left: 125px; right: 125px;
       display: flex; justify-content: space-between; align-items: flex-start;
-      font-family: var(--font-myeongjo); font-size: 28px; color: var(--text-main);
+      font-family: var(--font-myeongjo); font-size: 28px; color: var(--card-text);
       letter-spacing: 1px;
     }
 
@@ -209,7 +247,7 @@
 
     .card-cover .cover-title {
       font-family: var(--font-myeongjo);
-      font-size: 80px; font-weight: 800; color: var(--text-main);
+      font-size: 80px; font-weight: 800; color: var(--card-text);
       line-height: 1.4; word-break: keep-all; white-space: pre-wrap;
       letter-spacing: -1px;
     }
@@ -217,14 +255,14 @@
     .card-cover .gold-line {
       position: absolute;
       top: 1060px; left: 125px; width: 180px; height: 1px;
-      background-color: var(--gold-point);
+      background-color: var(--card-point);
     }
 
     .card-cover .cover-subtext {
       position: absolute;
       bottom: 150px; left: 125px; right: 125px;
       font-family: var(--font-sans) !important;
-      font-size: 20px; font-weight: 200; color: var(--text-main);
+      font-size: 20px; font-weight: 300; color: var(--card-text);
       line-height: 1.6; word-break: keep-all;
       text-align: justify;
       text-justify: inter-character;
@@ -232,14 +270,14 @@
     }
 
     .card-cover .cover-subtext strong {
-      font-family: var(--font-sans) !important; font-weight: 400 !important;
+      font-family: var(--font-sans) !important; font-weight: 500 !important;
     }
 
     /* 2. 본문 */
     .card-body-slide .body-header {
       position: absolute;
       top: 140px; left: 125px; right: 125px;
-      font-family: var(--font-myeongjo); font-size: 24px; color: var(--text-main);
+      font-family: var(--font-myeongjo); font-size: 24px; color: var(--card-text);
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
       letter-spacing: 1px;
     }
@@ -252,7 +290,7 @@
 
     .card-body-slide .body-text {
       font-family: var(--font-myeongjo);
-      font-size: 32px; color: var(--text-main);
+      font-size: 32px; color: var(--card-text);
       line-height: 2.2; word-break: keep-all; white-space: pre-wrap;
       letter-spacing: -1px;
       text-align: justify;
@@ -263,19 +301,19 @@
     .card-body-slide .full-gold-line {
       position: absolute;
       top: 1060px; left: 125px; right: 125px; height: 1px;
-      background-color: var(--gold-point);
+      background-color: var(--card-point);
     }
 
     .card-body-slide .page-number {
       position: absolute;
       bottom: 150px; right: 125px;
-      font-family: var(--font-myeongjo); font-size: 20px; color: var(--text-main);
+      font-family: var(--font-myeongjo); font-size: 20px; color: var(--card-text);
       line-height: 1;
     }
 
     /* 3. 클로징 */
     .card-closing {
-      background-color: #12151A;
+      background-color: var(--card-bg);
       display: flex; flex-direction: column; align-items: center;
     }
 
@@ -289,7 +327,7 @@
       position: absolute;
       top: 845px; left: 0; width: 100%;
       text-align: center; font-family: var(--font-myeongjo);
-      font-size: 32px; color: #E2E7ED; letter-spacing: -0.5px;
+      font-size: 32px; color: var(--card-text); letter-spacing: -0.5px;
     }
 
     /* 하단 저장 버튼 */
@@ -307,7 +345,7 @@
     }
 
     .btn-single-save:hover {
-      background-color: var(--gold-point); color: #121212; border-color: var(--gold-point);
+      background-color: var(--ui-gold); color: #121212; border-color: var(--ui-gold);
     }
   </style>
 </head>
@@ -318,6 +356,14 @@
     <div class="brand-header">
       <h1>깃들다 GDD</h1>
       <p>단어를 잇다. 문장을 붙이다. 책을 짓다.</p>
+    </div>
+
+    <div class="form-group">
+      <label>카드 테마 모드</label>
+      <div class="theme-selector">
+        <button type="button" class="theme-btn active" id="btnDark" data-theme="dark">다크 모드</button>
+        <button type="button" class="theme-btn" id="btnLight" data-theme="light">라이트 모드</button>
+      </div>
     </div>
 
     <div class="form-group">
@@ -343,7 +389,7 @@
     <div class="form-group">
       <label>마지막 엔딩 프로필 변경 (자동 저장)</label>
       <div class="file-input-wrapper">
-        <span id="fileLabel">프로필 이미지 선택 (깃허브 profile_dk.png 사용 중)</span>
+        <span id="fileLabel">프로필 이미지 선택 (기본 이미지 사용 중)</span>
         <input type="file" id="profileUploader" accept="image/*">
       </div>
     </div>
@@ -360,15 +406,45 @@
     (function() {
       const fixedAvatarSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><path d="M 50 110 Q 50 70 100 70 Q 150 70 150 110 Q 150 155 100 155 Q 50 155 50 110 Z" fill="%23E8971B"/><path d="M 65 75 Q 100 50 135 75 A 35 35 0 0 0 65 75 Z" fill="%23FDFCF8" stroke="%23121212" stroke-width="3"/><path d="M 68 73 Q 80 60 100 73 Q 120 60 132 73" fill="none" stroke="%23121212" stroke-width="3"/><circle cx="78" cy="112" r="16" fill="none" stroke="%23121212" stroke-width="3"/><circle cx="122" cy="112" r="16" fill="none" stroke="%23121212" stroke-width="3"/><line x1="94" y1="112" x2="106" y2="112" stroke="%23121212" stroke-width="3"/><path d="M 62 112 L 50 108" stroke="%23121212" stroke-width="3"/><path d="M 138 112 L 150 108" stroke="%23121212" stroke-width="3"/><circle cx="78" cy="112" r="3" fill="%23121212"/><circle cx="122" cy="112" r="3" fill="%23121212"/><path d="M 70 93 Q 78 88 86 93" fill="none" stroke="%23121212" stroke-width="3"/><path d="M 114 93 Q 122 88 130 93" fill="none" stroke="%23121212" stroke-width="3"/><path d="M 100 112 Q 95 125 103 127" fill="none" stroke="%23121212" stroke-width="3"/><path d="M 90 145 Q 105 132 115 145" fill="none" stroke="%23121212" stroke-width="3.5" stroke-linecap="round"/></svg>`;
 
-      let profileImgSrc = './profile_dk.png';
+      let currentTheme = 'dark'; // 'dark' 또는 'light'
+      let customProfileImg = null;
+
       try {
-        const saved = localStorage.getItem('gdd_profile_img');
-        if (saved) {
-          profileImgSrc = saved;
+        const savedTheme = localStorage.getItem('gdd_card_theme');
+        if (savedTheme === 'light' || savedTheme === 'dark') {
+          currentTheme = savedTheme;
+        }
+        const savedImg = localStorage.getItem('gdd_profile_img');
+        if (savedImg) {
+          customProfileImg = savedImg;
           const fileLabel = document.getElementById('fileLabel');
           if (fileLabel) fileLabel.innerText = "저장된 커스텀 프로필 사용 중";
         }
       } catch(e){}
+
+      function getCurrentProfileSrc() {
+        if (customProfileImg) return customProfileImg;
+        return currentTheme === 'light' ? './profile_lt.png' : './profile_dk.png';
+      }
+
+      function applyTheme(theme) {
+        currentTheme = theme;
+        try { localStorage.setItem('gdd_card_theme', theme); } catch(e){}
+
+        const btnDark = document.getElementById('btnDark');
+        const btnLight = document.getElementById('btnLight');
+
+        if (theme === 'light') {
+          document.body.classList.add('theme-light');
+          if (btnLight) btnLight.classList.add('active');
+          if (btnDark) btnDark.classList.remove('active');
+        } else {
+          document.body.classList.remove('theme-light');
+          if (btnDark) btnDark.classList.add('active');
+          if (btnLight) btnLight.classList.remove('active');
+        }
+        renderCards();
+      }
 
       function getFormattedDate() {
         const today = new Date();
@@ -384,6 +460,12 @@
           dateInput.value = getFormattedDate();
         }
 
+        // 테마 버튼 이벤트
+        const btnDark = document.getElementById('btnDark');
+        const btnLight = document.getElementById('btnLight');
+        if (btnDark) btnDark.addEventListener('click', () => applyTheme('dark'));
+        if (btnLight) btnLight.addEventListener('click', () => applyTheme('light'));
+
         const uploaderElem = document.getElementById('profileUploader');
         if (uploaderElem) {
           uploaderElem.addEventListener('change', function(e) {
@@ -391,8 +473,8 @@
             if (file) {
               const reader = new FileReader();
               reader.onload = function(evt) {
-                profileImgSrc = evt.target.result;
-                try { localStorage.setItem('gdd_profile_img', profileImgSrc); } catch(err){}
+                customProfileImg = evt.target.result;
+                try { localStorage.setItem('gdd_profile_img', customProfileImg); } catch(err){}
                 const fileLabel = document.getElementById('fileLabel');
                 if (fileLabel) fileLabel.innerText = "커스텀 프로필 교체 완료";
                 renderCards();
@@ -412,7 +494,7 @@
           if (el) el.addEventListener('input', renderCards);
         });
 
-        renderCards();
+        applyTheme(currentTheme);
       }
 
       function formatSubtext(str) {
@@ -429,7 +511,6 @@
         const textEl = document.getElementById('textInput');
         const rawText = textEl ? textEl.value.trim() : '';
         
-        // 원고가 완전히 비어있을 때 사용할 기본 예시 단락 지정
         let paragraphs = rawText.split(/\n\s*\n/).filter(p => p.trim() !== '');
         if (paragraphs.length === 0) {
           paragraphs = ['{제목 입력 칸입니다.}', '{본문 내용을 입력해 주세요.}'];
@@ -442,7 +523,7 @@
         const rawTitle = paragraphs[0] || '{제목 입력 칸입니다.}';
         const cleanHeaderTitle = rawTitle.replace(/\n/g, ' ');
 
-        // 1. 표지 (기본 1번)
+        // 1. 표지
         const coverWrap = createCardWrapper(1);
         const coverCard = coverWrap.querySelector('.card-preview');
         coverCard.className = 'card-preview card-cover';
@@ -459,7 +540,7 @@
         `;
         container.appendChild(coverWrap);
 
-        // 2. 본문 (기본 2번~)
+        // 2. 본문
         const bodyParagraphs = paragraphs.slice(1);
         bodyParagraphs.forEach((para, idx) => {
           const cardNum = idx + 2;
@@ -477,13 +558,13 @@
           container.appendChild(bodyWrap);
         });
 
-        // 3. 클로징 (기본 마지막 번호)
+        // 3. 클로징
         const lastCardNum = bodyParagraphs.length + 2;
         const closingWrap = createCardWrapper(lastCardNum);
         const closingCard = closingWrap.querySelector('.card-preview');
         closingCard.className = 'card-preview card-closing';
         closingCard.innerHTML = `
-          <img class="closing-profile-img" src="${profileImgSrc}">
+          <img class="closing-profile-img" src="${getCurrentProfileSrc()}">
           <div class="closing-username">@AUTHOR.YONG</div>
         `;
         
@@ -549,6 +630,9 @@
         });
         await Promise.all(imagePromises);
 
+        // 현재 테마에 맞는 배경색 가져오기
+        const activeBgColor = currentTheme === 'light' ? '#F8F7F3' : '#12151A';
+
         const clone = cardElem.cloneNode(true);
         Object.assign(clone.style, {
           position: 'fixed',
@@ -561,7 +645,7 @@
           transform: 'none',
           margin: '0',
           padding: '0',
-          backgroundColor: '#12151A'
+          backgroundColor: activeBgColor
         });
 
         document.body.appendChild(clone);
@@ -570,7 +654,7 @@
           width: 1080,
           height: 1350,
           scale: 1,
-          backgroundColor: '#12151A',
+          backgroundColor: activeBgColor,
           useCORS: true,
           allowTaint: true,
           scrollX: 0,
